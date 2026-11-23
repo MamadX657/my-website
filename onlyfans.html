@@ -902,15 +902,26 @@
             gap: 12px;
             padding: 14px 0;
             border-bottom: 1px solid #2f3336;
-            filter: blur(8px);
-            opacity: 0.3;
-            pointer-events: none;
-            user-select: none;
             transition: 0.3s;
             position: relative;
         }
+
         .tweet-item:last-of-type {
             border-bottom: none;
+        }
+
+        /* حالت قفل‌شده پیش‌فرض (پلن Basic) */
+        .tweet-item.locked-hidden {
+            display: none;
+        }
+
+        .tweet-item.locked-preview {
+            filter: blur(14px);
+            opacity: 0.15;
+            pointer-events: none;
+            user-select: none;
+            max-height: 420px;
+            overflow: hidden;
         }
 
         .tweet-item.unlocked {
@@ -918,7 +929,9 @@
             opacity: 1;
             pointer-events: auto;
             user-select: auto;
-        }
+            max-height: none;
+            overflow: visible;
+        }        
 
         .tweet-item.pro-unlocked .tweet-text {
             font-weight: 500;
@@ -1631,8 +1644,22 @@
 
         function applyPlanClasses(plan) {
             const features = PLAN_FEATURES[plan] || PLAN_FEATURES.basic;
-            document.querySelectorAll('.tweet-item').forEach(item => {
-                item.classList.toggle('unlocked', !!features.unlockAll);
+            const items = document.querySelectorAll('.tweet-item');
+
+            items.forEach((item, index) => {
+                item.classList.remove('locked-hidden', 'locked-preview', 'unlocked');
+
+                if (features.unlockAll) {
+                    item.classList.add('unlocked');
+                } else {
+                    // پلن Basic: فقط پست اول به صورت محو، بقیه مخفی
+                    if (index === 0) {
+                        item.classList.add('locked-preview');
+                    } else {
+                        item.classList.add('locked-hidden');
+                    }
+                }
+
                 item.classList.toggle('pro-unlocked', !!features.hd);
                 const isPremiumPost = !!item.querySelector('.premium-content-badge');
                 item.classList.toggle('premium-content-unlocked', !!features.premiumContent && isPremiumPost);
@@ -1871,6 +1898,7 @@
             successUnlock.classList.remove('show');
 
             markActivePlanCard('basic');
+            applyPlanClasses('basic');   // ← اعمال حالت جدید قفل
 
             accessKeyInput.disabled = false;
             accessKeyInput.value = '';
@@ -1894,7 +1922,6 @@
                 showExpiryToast();
             }
         }
-
         // ===== START EXPIRY CHECKER =====
         function startExpiryChecker() {
             if (expiryCheckInterval) clearInterval(expiryCheckInterval);
