@@ -67,7 +67,6 @@
         .cover-image {
             width: 100%;
             height: 150px;
-            background-image: url('2 (3).jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -173,7 +172,7 @@
         /* ===== BIO COLLAPSIBLE ===== */
         .bio.bio-collapsed {
             display: -webkit-box;
-            -webkit-line-clamp: 4;      /* تعداد خطوط قابل نمایش در حالت بسته */
+            -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
             overflow: hidden;
             position: relative;
@@ -1146,12 +1145,12 @@
 <div class="profile-card">
 
     <!-- ===== COVER IMAGE ===== -->
-    <div class="cover-image"></div>
+    <div class="cover-image" id="coverImage"></div>
 
     <!-- ===== AVATAR / PROFILE PICTURE ===== -->
     <div class="avatar-wrapper">
         <div class="avatar">
-            <img src="1 (25).jpg" alt="Profile picture" id="profileImg" draggable="false" oncontextmenu="return false;" />
+            <img src="" alt="Profile picture" id="profileImg" draggable="false" oncontextmenu="return false;" />
             <span class="fallback-icon"><i class="fas fa-user"></i></span>
         </div>
     </div>
@@ -1379,13 +1378,22 @@
 
 <script>
     (function() {
+        // ===== BASE URL — AUTO-DETECTED =====
+        // All asset paths (avatar, cover, post media) are resolved relative to this.
+        // If your files are at the domain root, change this to '/'.
+        const BASE_URL = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+
+        // ===== ASSET PATHS (edit only these) =====
+        const PROFILE_AVATAR = BASE_URL + '1 (25).jpg';
+        const COVER_IMAGE    = BASE_URL + '2 (3).jpg';
+        const POST_AVATAR    = BASE_URL + '4.png';
+
         // ===== POSTS ARRAY — ADD NEW POSTS HERE =====
         // type: "video" | "image"
-        // src: relative path to media file
+        // src: relative path to media file (resolved against BASE_URL automatically)
         // text: post caption
         // premium: true = show Premium badge (exclusive content)
         // download: true = show download button (only effective for Premium plan)
-        // IMPORTANT: every item MUST end with a comma (except optionally the last one)
         const POSTS = [
             { type: 'image', src: 'onlyfans/1.jpg', text: '😍', premium: false, download: false },
             { type: 'image', src: 'onlyfans/2.webp', text: '', premium: false, download: false },
@@ -1415,7 +1423,7 @@
             { type: 'image', src: 'onlyfans/26.jpeg', text: '👾', premium: true, download: true },
             { type: 'image', src: 'onlyfans/27.jpeg', text: '', premium: true, download: true },
             { type: 'image', src: 'onlyfans/28.jpg', text: '☠ subscriber exclusive ☠', premium: true, download: true },
-            { type: 'image', src: 'on;yfans/29.jpeg', text: '🤍', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/29.jpeg', text: '🤍', premium: false, download: false },
             { type: 'image', src: 'onlyfans/30.jpeg', text: '💛', premium: true, download: true },
             { type: 'image', src: 'onlyfans/31.jpeg', text: '', premium: true, download: true },
             { type: 'image', src: 'onlyfans/32.jpg', text: '💯', premium: true, download: true },
@@ -1437,8 +1445,23 @@
             { type: 'image', src: 'onlyfans/48.jpeg', text: '💎', premium: true, download: true },
             { type: 'image', src: 'onlyfans/49.jpeg', text: '☠ last exclusive, enjoy ☠', premium: true, download: true },
             { type: 'image', src: 'onlyfans/50.jpg', text: '😈 locked pic for premium 😈', premium: true, download: true }
+        ];
 
-        ];        // ===== RANDOM BLURRED FULL-PAGE BACKGROUND =====
+        // ===== RESOLVE POST MEDIA PATHS =====
+        POSTS.forEach(post => {
+            if (post.src && !/^https?:\/\//i.test(post.src) && !post.src.startsWith('/')) {
+                post.src = BASE_URL + post.src;
+            }
+        });
+
+        // ===== APPLY PROFILE ASSETS =====
+        const profileImg = document.getElementById('profileImg');
+        if (profileImg) profileImg.src = PROFILE_AVATAR;
+
+        const coverImage = document.getElementById('coverImage');
+        if (coverImage) coverImage.style.backgroundImage = `url("${COVER_IMAGE}")`;
+
+        // ===== RANDOM BLURRED FULL-PAGE BACKGROUND =====
         const bgImages = POSTS
             .filter(post => post.type === 'image')
             .map(post => post.src);
@@ -1584,7 +1607,7 @@
                 item.id = 'tweet-' + i;
                 item.innerHTML = `
                     <div class="tweet-avatar-mini">
-                        <img src="4.png" alt="A" draggable="false" oncontextmenu="return false;" />
+                        <img src="${POST_AVATAR}" alt="A" draggable="false" oncontextmenu="return false;" />
                     </div>
                     <div class="tweet-content">
                         <div class="tweet-header">
