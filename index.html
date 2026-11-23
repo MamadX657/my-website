@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alina kovaceva - Links</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #faf5ff 0%, #f0e8ff 50%, #f5f5f7 100%);
+            color: #1a1a1a;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative background bubbles */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            background: #c4a7f5;
+            top: -80px;
+            right: -80px;
+            animation: floatBubble 8s ease-in-out infinite;
+        }
+
+        body::after {
+            width: 250px;
+            height: 250px;
+            background: #a78bfa;
+            bottom: -60px;
+            left: -60px;
+            animation: floatBubble 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Avatar with glowing purple ring */
+        .avatar-wrapper {
+            position: relative;
+            width: 104px;
+            height: 104px;
+            margin: 0 auto 16px;
+        }
+
+        .avatar-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #a78bfa, #c4a7f5, #8b5cf6, #a78bfa);
+            z-index: 0;
+            animation: spinRing 6s linear infinite;
+        }
+
+        @keyframes spinRing {
+            to { transform: rotate(360deg); }
+        }
+
+        .avatar {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            border: 3px solid #fff;
+            z-index: 1;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Name and status */
+        .name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #2d1b4e;
+            letter-spacing: -0.3px;
+        }
+
+        .name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #2d1b4e;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .verified-badge {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .handle {
+            font-size: 0.9rem;
+            color: #8b7aa8;
+            margin-bottom: 8px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #16a34a;
+            margin-bottom: 24px;
+            background: rgba(22, 163, 74, 0.1);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .status i {
+            font-size: 8px;
+            animation: pulseDot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Link buttons */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 20px;
+            background: #ffffff;
+            border: 1.5px solid #e8e0f5;
+            border-radius: 14px;
+            color: #2d1b4e;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
+            cursor: pointer;
+        }
+
+        .link-btn:hover {
+            background: #faf7ff;
+            border-color: #c4a7f5;
+            box-shadow: 0 6px 18px rgba(139, 92, 246, 0.18);
+            transform: translateY(-3px);
+        }
+
+        .link-btn:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        /* Main purple button with heartbeat animation */
+        .link-btn.purple {
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+            animation: heartbeat 1.6s ease-in-out infinite;
+        }
+
+        .link-btn.purple:hover {
+            background: linear-gradient(135deg, #9b7cf8 0%, #7c3aed 100%);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+            transform: translateY(-3px) scale(1.01);
+            animation-play-state: paused;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+            }
+            14% {
+                transform: scale(1.04);
+                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.55);
+            }
+            28% {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+            }
+            42% {
+                transform: scale(1.04);
+                box-shadow: 0 6px 20px rgba(139, 92, 246, 0.55);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: #9b8fb3;
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            color: #6d28d9;
+            text-decoration: underline;
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 10, 35, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 22px;
+            width: 100%;
+            max-width: 460px;
+            padding: 28px 24px 24px;
+            position: relative;
+            box-shadow: 0 24px 60px rgba(45, 27, 78, 0.3);
+            transform: translateY(20px) scale(0.96);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid #ede6fb;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f0fd;
+            color: #7c6a9e;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: #ede4fb;
+            color: #5b21b6;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #2d1b4e;
+            text-align: center;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+
+        .modal-subtitle {
+            font-size: 0.82rem;
+            color: #8b7aa8;
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        /* Contact items inside Collabs modal */
+        .contact-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            background: #faf7ff;
+            color: #2d1b4e;
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border: 1.5px solid #e8e0f5;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .contact-item i {
+            font-size: 1.05rem;
+            color: #8b5cf6;
+            width: 20px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .contact-item:hover {
+            background: #f5efff;
+            border-color: #c4a7f5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.18);
+        }
+
+        .contact-item.twitter:hover {
+            border-color: #1da1f2;
+            color: #1da1f2;
+        }
+
+        .contact-item.twitter:hover i {
+            color: #1da1f2;
+        }
+
+        /* Copied state */
+        .contact-item.email.copied {
+            border-color: #22c55e;
+            color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .contact-item.email.copied i {
+            color: #22c55e;
+        }
+
+        /* ===== TIP MODAL SPECIFIC ===== */
+        .tip-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tip-profile-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e8e0f5;
+            box-shadow: 0 6px 18px rgba(139, 92, 246, 0.2);
+            background: #f5f0fd;
+        }
+
+        .tip-profile-name {
+            color: #2d1b4e;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .tip-profile-sub {
+            color: #8b7aa8;
+            font-size: 0.78rem;
+            margin-top: 2px;
+        }
+
+        .tip-notice {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 11px 13px;
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            color: #1e3a5f;
+            font-size: 12.5px;
+            line-height: 1.5;
+        }
+
+        .tip-notice i {
+            color: #3b82f6;
+            font-size: 16px;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .tip-notice strong {
+            color: #2563eb;
+        }
+
+        .tip-box {
+            background: #faf7ff;
+            border-radius: 16px;
+            padding: 16px 14px;
+            border: 1.5px solid #e8e0f5;
+        }
+
+        .tip-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #2d1b4e;
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .tip-label i {
+            color: #16a34a;
+        }
+
+        .network-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .network-tab {
+            flex: 1;
+            background: #ffffff;
+            border: 1.5px solid #e8e0f5;
+            color: #8b7aa8;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 10px 6px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .network-tab i {
+            font-size: 15px;
+        }
+
+        .network-tab:hover {
+            border-color: #a78bfa;
+            color: #5b21b6;
+        }
+
+        .network-tab.active {
+            border-color: #8b5cf6;
+            background: #f5efff;
+            color: #7c3aed;
+        }
+
+        .address-box {
+            background: #ffffff;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e8e0f5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            word-break: break-all;
+        }
+
+        .address-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            color: #2d1b4e;
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            background: #f5f0fd;
+            border: 1.5px solid #e0d4f5;
+            padding: 8px 13px;
+            border-radius: 40px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #7c6a9e;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            background: #ede4fb;
+            border-color: #c4a7f5;
+            color: #5b21b6;
+            transform: scale(1.03);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.copied {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-color: #86efac;
+        }
+
+        .network-warning {
+            margin-top: 10px;
+            padding: 9px 11px;
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            border-radius: 8px;
+            color: #92400e;
+            font-size: 11.5px;
+            line-height: 1.5;
+            display: flex;
+            gap: 7px;
+            align-items: flex-start;
+        }
+
+        .network-warning i {
+            margin-top: 2px;
+            flex-shrink: 0;
+            color: #d97706;
+        }
+
+        .network-warning.danger {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .network-warning.danger i {
+            color: #dc2626;
+        }
+
+        .network-warning code {
+            background: #ffffff;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 11px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .tip-footer-note {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #8b7aa8;
+            background: #faf7ff;
+            padding: 11px 10px;
+            border-radius: 40px;
+            border: 1px solid #e8e0f5;
+        }
+
+        .tip-footer-note strong {
+            color: #5b21b6;
+            font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(20px);
+            background: #2d1b4e;
+            color: #ffffff;
+            border: 1px solid #22c55e;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 2000;
+            box-shadow: 0 8px 24px rgba(45, 27, 78, 0.3);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #22c55e;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .link-btn {
+                padding: 14px 16px;
+                font-size: 0.9rem;
+            }
+            .avatar-wrapper {
+                width: 92px;
+                height: 92px;
+            }
+            .modal {
+                padding: 24px 16px 20px;
+            }
+            .modal-title {
+                font-size: 1.05rem;
+            }
+            .address-box {
+                flex-wrap: wrap;
+            }
+            .copy-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .avatar-wrapper::before,
+            .status i,
+            body::before,
+            body::after {
+                animation: none;
+            }
+            .link-btn.purple {
+                animation: none;
+            }
+            .link-btn:hover {
+                transform: none;
+            }
+            .modal,
+            .modal-close:hover {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Avatar with spinning purple ring -->
+    <div class="avatar-wrapper">
+        <img class="avatar" src="1 (25).jpg" alt="alinakovaceva">
+    </div>
+
+    <!-- Name and status -->
+    <div class="name">
+        alinakovaceva
+        <svg class="verified-badge" viewBox="0 0 24 24" aria-label="Verified" role="img">
+            <path fill="#1d9bf0" d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.918-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.337 2.25c-.416-.165-.866-.25-1.336-.25-2.21 0-3.918 1.79-3.918 4 0 .495.084.965.238 1.4-1.273.65-2.148 2.02-2.148 3.6 0 1.46.75 2.73 1.875 3.45-.05.24-.075.49-.075.75 0 2.21 1.71 4 3.918 4 .47 0 .92-.086 1.336-.25.52 1.33 1.828 2.25 3.337 2.25s2.816-.92 3.337-2.25c.416.165.866.25 1.336.25 2.21 0 3.918-1.79 3.918-4 0-.26-.025-.51-.075-.75 1.125-.72 1.875-1.99 1.875-3.45z"/>
+            <path fill="#fff" d="M10.6 16.2l-3.3-3.3 1.4-1.4 1.9 1.9 5-5 1.4 1.4-6.4 6.4z"/>
+        </svg>
+    </div>
+    <div class="handle">@alinakovaceva</div>
+    <div class="status">
+        <i class="fas fa-circle"></i> Online
+    </div>
+
+    <!-- Link list -->
+    <div class="links">
+        <!-- Official Page - purple gradient with heartbeat -->
+        <a href="onlyfans.html" class="link-btn purple" target="_blank" rel="noopener noreferrer">
+            🔞 video (onlyfans)
+        </a>
+
+        <!-- Collabs button - opens modal -->
+        <button type="button" class="link-btn" id="collabsBtn">
+            Collabs
+        </button>
+
+        <!-- Tip button - opens modal -->
+        <button type="button" class="link-btn" id="tipBtn">
+            tip
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2026 alinakovaceva. All rights reserved.
+    </div>
+</div>
+
+<!-- ===== COLLABS MODAL ===== -->
+<div class="modal-overlay" id="collabsModal">
+    <div class="modal">
+        <button type="button" class="modal-close" id="collabsClose" aria-label="Close">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="modal-title">Contact us for communication and collaboration</div>
+        <div class="modal-subtitle">Contact Us for Advertising</div>
+
+        <div class="contact-items">
+            <!-- Email -->
+            <a href="mailto:alinakovaceva1@gmail.com" class="contact-item email" id="emailBtn">
+                <i class="fas fa-envelope"></i>
+                <span class="email-text">alinakovaceva1@gmail.com</span>
+            </a>
+
+            <!-- Twitter -->
+            <a href="https://linkedin.com/in/yourusername" class="contact-item twitter" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-twitter"></i> Twitter
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TIP MODAL ===== -->
+<div class="modal-overlay" id="tipModal">
+    <div class="modal">
+        <button type="button" class="modal-close" id="tipClose" aria-label="Close">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Profile -->
+
+        <!-- Crypto notice -->
+        <div class="tip-notice">
+            <i class="fas fa-coins"></i>
+            <div>
+                <strong>Crypto payments only.</strong> We accept <strong>USDT</strong> only. Choose your network below.
+            </div>
+        </div>
+
+        <!-- Tip box -->
+        <div class="tip-box">
+            <div class="tip-label">
+                <i class="fas fa-hand-holding-dollar"></i> Send USDT — choose network
+            </div>
+
+            <!-- Network tabs -->
+            <div class="network-tabs">
+                <button type="button" class="network-tab active" data-network="evm">
+                    <i class="fas fa-link"></i> EVM
+                </button>
+                <button type="button" class="network-tab" data-network="trc20">
+                    <i class="fas fa-bolt"></i> TRC20
+                </button>
+            </div>
+
+            <!-- EVM address -->
+            <div id="evmBlock">
+                <div class="address-box">
+                    <span class="address-text" id="evmAddress">0xdF86AEFca5F169171baec43D5A01625Aa593cDBb</span>
+                    <button class="copy-btn" data-target="evmAddress">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="network-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>EVM networks supported:</strong> Ethereum (ERC20), BNB Chain (BEP20), Polygon, Arbitrum, Optimism, Base, and other EVM-compatible chains.
+                    </div>
+                </div>
+                <div class="network-warning danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Do NOT send via TRC20 to this address.</strong> TRON addresses start with <code>T</code>. Use the TRC20 tab for TRON.
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRC20 address -->
+            <div id="trc20Block" style="display:none;">
+                <div class="address-box">
+                    <span class="address-text" id="trc20Address">TNJAs22K7rSVGQGpkiK9rNeo1GtyY3C9Xu</span>
+                    <button class="copy-btn" data-target="trc20Address">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div class="network-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>TRON network (TRC20) only.</strong> Send USDT on the TRON network to this address. Do not use ERC20/BEP20 for this address.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tip-footer-note">
+            <strong>🙏 thank you</strong> · every bit helps
+        </div>
+    </div>
+</div>
+
+<!-- Toast element -->
+<div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i> <span>Email copied!</span>
+</div>
+
+<script>
+    (function () {
+        /* ===== Modal management ===== */
+        const collabsModal = document.getElementById('collabsModal');
+        const tipModal = document.getElementById('tipModal');
+
+        function openModal(modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function setupModal(modal, openBtn, closeBtn) {
+            openBtn.addEventListener('click', function () { openModal(modal); });
+            closeBtn.addEventListener('click', function () { closeModal(modal); });
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal(modal);
+            });
+        }
+
+        setupModal(collabsModal, document.getElementById('collabsBtn'), document.getElementById('collabsClose'));
+        setupModal(tipModal, document.getElementById('tipBtn'), document.getElementById('tipClose'));
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                if (collabsModal.classList.contains('active')) closeModal(collabsModal);
+                if (tipModal.classList.contains('active')) closeModal(tipModal);
+            }
+        });
+
+        /* ===== Toast ===== */
+        const toast = document.getElementById('toast');
+        let toastTimer = null;
+
+        function showToast(message) {
+            toast.querySelector('span').textContent = message || 'Copied!';
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        /* ===== Collabs: copy email ===== */
+        const emailLink = document.getElementById('emailBtn');
+        const emailText = emailLink.querySelector('.email-text');
+        const email = 'alinakovaceva1@gmail.com';
+
+        function showCopiedState() {
+            const originalIcon = emailLink.querySelector('i').className;
+            emailLink.classList.add('copied');
+            emailLink.querySelector('i').className = 'fas fa-check';
+            emailText.textContent = 'Copied!';
+
+            setTimeout(function () {
+                emailLink.classList.remove('copied');
+                emailLink.querySelector('i').className = originalIcon;
+                emailText.textContent = email;
+            }, 1800);
+
+            showToast('Email copied!');
+        }
+
+        function fallbackCopy(text, onSuccess) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                onSuccess();
+            } catch (err) {
+                alert('Could not copy. Please copy manually: ' + text);
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        emailLink.addEventListener('click', function (e) {
+            if (e.ctrlKey || e.metaKey) return;
+            e.preventDefault();
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(email)
+                    .then(showCopiedState)
+                    .catch(function () { fallbackCopy(email, showCopiedState); });
+            } else {
+                fallbackCopy(email, showCopiedState);
+            }
+        });
+
+        /* ===== Tip: network tabs ===== */
+        const tabs = tipModal.querySelectorAll('.network-tab');
+        const evmBlock = document.getElementById('evmBlock');
+        const trc20Block = document.getElementById('trc20Block');
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                tabs.forEach(function (t) { t.classList.remove('active'); });
+                this.classList.add('active');
+                const net = this.getAttribute('data-network');
+                if (net === 'evm') {
+                    evmBlock.style.display = '';
+                    trc20Block.style.display = 'none';
+                } else {
+                    evmBlock.style.display = 'none';
+                    trc20Block.style.display = '';
+                }
+            });
+        });
+
+        /* ===== Tip: copy address ===== */
+        const copyBtns = tipModal.querySelectorAll('.copy-btn');
+
+        copyBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const targetId = btn.getAttribute('data-target');
+                const addressText = document.getElementById(targetId).innerText.trim();
+
+                function onSuccess() {
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    btn.classList.add('copied');
+                    showToast('Address copied!');
+                    setTimeout(function () {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove('copied');
+                    }, 2000);
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(addressText)
+                        .then(onSuccess)
+                        .catch(function () { fallbackCopy(addressText, onSuccess); });
+                } else {
+                    fallbackCopy(addressText, onSuccess);
+                }
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Profile — Twitter Clone</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* ===== ANIMATED BLURRED FULL-PAGE BACKGROUND ===== */
+        .page-bg {
+            position: fixed;
+            inset: -30px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(14px) brightness(0.45);
+            transform: scale(1.15);
+            animation: bgPan 22s ease-in-out infinite alternate;
+            z-index: -1;
+            will-change: transform;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .page-bg.fading {
+            opacity: 0;
+        }
+
+        @keyframes bgPan {
+            0%   { transform: scale(1.15) translate(-2%, -1.5%); }
+            50%  { transform: scale(1.25) translate(2%, 1.5%); }
+            100% { transform: scale(1.15) translate(-1.5%, 2%); }
+        }
+
+        .profile-card {
+            max-width: 620px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            border: 1px solid #2f3336;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== COVER IMAGE ===== */
+        .cover-image {
+            width: 100%;
+            height: 150px;
+            background-image: url('2 (3).jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #1e7b85;
+            position: relative;
+        }
+
+        .cover-image::after {
+            content: "";
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            color: rgba(255,255,255,0.3);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== AVATAR / PROFILE PICTURE ===== */
+        .avatar-wrapper {
+            position: relative;
+            padding: 0 16px;
+            margin-top: -60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #000;
+            box-shadow: 0 0 0 2px #000, 0 8px 12px rgba(0,0,0,0.6);
+            overflow: hidden;
+            background: #1d9bf0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+        }
+
+        .avatar .fallback-icon {
+            font-size: 50px;
+            color: #fff;
+            display: none;
+        }
+
+        .avatar img:not([src]), 
+        .avatar img[src=""],
+        .avatar img[src="#"] {
+            display: none;
+        }
+
+        .avatar img:not([src]) + .fallback-icon,
+        .avatar img[src=""] + .fallback-icon,
+        .avatar img[src="#"] + .fallback-icon {
+            display: block;
+        }
+
+        .user-info {
+            padding: 12px 16px 0 16px;
+            color: #e7e9ea;
+        }
+
+        .display-name {
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .verified-badge {
+            color: #1d9bf0;
+            font-size: 18px;
+        }
+
+        .bio {
+            margin-top: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #e7e9ea;
+        }
+
+        .bio a {
+            color: #1d9bf0;
+            text-decoration: none;
+        }
+        .bio a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== BIO COLLAPSIBLE ===== */
+        .bio.bio-collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;      /* تعداد خطوط قابل نمایش در حالت بسته */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bio.bio-collapsed::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.82));
+            pointer-events: none;
+        }
+
+        .bio-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            background: transparent;
+            border: none;
+            color: #1d9bf0;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            transition: color 0.2s;
+        }
+
+        .bio-toggle-btn:hover {
+            color: #1a8cd8;
+            text-decoration: underline;
+        }
+
+        .bio-toggle-btn i {
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+
+        .bio-toggle-btn.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .info-divider {
+            margin-top: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #2f3336;
+        }
+
+        /* ===== SUBSCRIPTION STATUS PANEL ===== */
+        .subscription-status {
+            margin: 16px 16px 0 16px;
+            background: #0f0f0f;
+            border-radius: 20px;
+            border: 1px solid #2f3336;
+            padding: 16px;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .subscription-status.show {
+            display: block;
+        }
+
+        .subscription-status.expired-panel {
+            border-color: #f4212e;
+            background: #1a0a0a;
+        }
+
+        .subscription-status .status-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #e7e9ea;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .subscription-status .status-header i {
+            font-size: 20px;
+        }
+
+        .subscription-status .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #2f3336;
+            font-size: 14px;
+        }
+        .subscription-status .status-row:last-child {
+            border-bottom: none;
+        }
+
+        .subscription-status .status-row .label {
+            color: #71767b;
+        }
+
+        .subscription-status .status-row .value {
+            color: #e7e9ea;
+            font-weight: 600;
+        }
+
+        .subscription-status .plan-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .plan-badge.basic { background: #71767b; }
+        .plan-badge.pro { background: #1d9bf0; }
+        .plan-badge.yearly { background: #00ba7c; }
+        .plan-badge.premium { background: #f7b731; color: #000; }
+
+        .subscription-status .remaining {
+            font-weight: 800;
+            font-size: 15px;
+        }
+        .subscription-status .remaining.warning {
+            color: #f7b731;
+        }
+        .subscription-status .remaining.danger {
+            color: #f4212e;
+        }
+        .subscription-status .remaining.good {
+            color: #00ba7c;
+        }
+
+        .progress-bar-wrap {
+            margin-top: 12px;
+            height: 8px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #1d9bf0, #00ba7c);
+        }
+
+        .expiry-alert {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #2a0f0f;
+            border: 1px solid #f4212e;
+            border-radius: 10px;
+            color: #f4212e;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .expiry-alert.show {
+            display: flex;
+        }
+
+        .renew-btn {
+            background: #1d9bf0;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .renew-btn:hover {
+            background: #1a8cd8;
+        }
+        .renew-btn.show {
+            display: flex;
+        }
+
+        /* ===== WELCOME TOAST ===== */
+        .welcome-toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: linear-gradient(135deg, #1d9bf0, #00ba7c);
+            color: #fff;
+            padding: 18px 28px;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            z-index: 10000;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            max-width: 92vw;
+        }
+        .welcome-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .welcome-toast .toast-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .welcome-toast .toast-sub {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        .welcome-toast.premium-toast {
+            background: linear-gradient(135deg, #f7b731, #f7931a);
+            color: #000;
+        }
+        .welcome-toast.yearly-toast {
+            background: linear-gradient(135deg, #00ba7c, #1d9bf0);
+        }
+        .welcome-toast.expired-toast {
+            background: linear-gradient(135deg, #f4212e, #8b0000);
+            color: #fff;
+        }
+
+        /* ===== PRICING PLANS ===== */
+        .pricing-section {
+            margin: 16px 16px 8px 16px;
+            background: #0f0f0f;
+            border-radius: 20px;
+            border: 1px solid #2f3336;
+            padding: 18px 16px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .pricing-section.hidden {
+            display: none;
+        }
+
+        .pricing-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 1px solid #2f3336;
+            color: #71767b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: 0.2s;
+            z-index: 2;
+        }
+        .pricing-close-btn:hover {
+            background: #2f3336;
+            color: #e7e9ea;
+            transform: rotate(90deg);
+        }
+
+        .reopen-pricing-btn {
+            display: none;
+            margin: 16px 16px 8px 16px;
+            background: #0f0f0f;
+            border: 1px dashed #2f3336;
+            border-radius: 20px;
+            padding: 14px 16px;
+            color: #1d9bf0;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+            width: calc(100% - 32px);
+        }
+        .reopen-pricing-btn:hover {
+            border-color: #1d9bf0;
+            background: #0f1a24;
+        }
+        .reopen-pricing-btn.show {
+            display: flex;
+        }
+
+        .pricing-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #e7e9ea;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 16px;
+            padding-right: 30px;
+        }
+        .pricing-title i {
+            color: #f7b731;
+            font-size: 20px;
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .plan-card {
+            background: #1a1a1a;
+            border-radius: 14px;
+            padding: 14px 8px;
+            border: 1px solid #2f3336;
+            text-align: center;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .plan-card:hover {
+            border-color: #1d9bf0;
+        }
+        .plan-card.selected {
+            border-color: #1d9bf0;
+            background: #0f1a24;
+        }
+        .plan-card.active-plan {
+            border-color: #00ba7c;
+            background: #0f1f0f;
+            box-shadow: 0 0 0 1px #00ba7c;
+        }
+        .plan-card.active-plan::after {
+            content: "✓ Active";
+            display: block;
+            margin-top: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #00ba7c;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-name {
+            color: #e7e9ea;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .plan-price {
+            color: #1d9bf0;
+            font-weight: 800;
+            font-size: 20px;
+        }
+        .plan-price small {
+            color: #71767b;
+            font-weight: 400;
+            font-size: 12px;
+        }
+        .plan-feature {
+            color: #71767b;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .premium-highlight {
+            border-color: #f7b731;
+            background: #1f1a0f;
+        }
+        .premium-highlight .plan-name {
+            color: #f7b731;
+        }
+        .premium-highlight .plan-price {
+            color: #f7b731;
+        }
+
+        .buy-btn {
+            background: #1d9bf0;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .buy-btn:hover {
+            background: #1a8cd8;
+            transform: scale(0.98);
+        }
+
+        .payment-details {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: #111;
+            border-radius: 16px;
+            border: 1px solid #2f3336;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .payment-details.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== CRYPTO-ONLY NOTICE ===== */
+        .crypto-notice {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 12px 14px;
+            background: #0f1a24;
+            border: 1px solid #1d9bf0;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            color: #c9d1d9;
+            font-size: 13.5px;
+            line-height: 1.55;
+        }
+        .crypto-notice i {
+            color: #1d9bf0;
+            font-size: 18px;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+        .crypto-notice strong {
+            color: #1d9bf0;
+        }
+
+        .payment-details label {
+            color: #e7e9ea;
+            font-weight: 500;
+            font-size: 14px;
+            display: block;
+            margin: 12px 0 4px 0;
+        }
+        .payment-details label:first-of-type {
+            margin-top: 0;
+        }
+
+        .address-box {
+            background: #0a0a0a;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #2f3336;
+            color: #1d9bf0;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .address-box i {
+            color: #71767b;
+        }
+
+        /* ===== NETWORK TABS ===== */
+        .network-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 4px 0 10px 0;
+            flex-wrap: wrap;
+        }
+        .network-tab {
+            flex: 1;
+            min-width: 90px;
+            background: #0a0a0a;
+            border: 1px solid #2f3336;
+            color: #71767b;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 6px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .network-tab i {
+            font-size: 14px;
+        }
+        .network-tab:hover {
+            border-color: #1d9bf0;
+            color: #e7e9ea;
+        }
+        .network-tab.active {
+            border-color: #1d9bf0;
+            background: #0f1a24;
+            color: #1d9bf0;
+        }
+
+        .network-warning {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: #1f1a0f;
+            border-left: 4px solid #f7b731;
+            border-radius: 8px;
+            color: #f7b731;
+            font-size: 12.5px;
+            line-height: 1.5;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .network-warning i {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .network-warning.danger {
+            background: #2a0f0f;
+            border-left-color: #f4212e;
+            color: #f4212e;
+        }
+
+        .receipt-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #2f3336;
+            background: #0a0a0a;
+            color: #e7e9ea;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .receipt-input:focus {
+            border-color: #1d9bf0;
+        }
+        .receipt-input::placeholder {
+            color: #555;
+        }
+
+        .access-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #2f3336;
+            background: #0a0a0a;
+            color: #e7e9ea;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+            font-family: monospace;
+        }
+        .access-input:focus {
+            border-color: #1d9bf0;
+        }
+        .access-input::placeholder {
+            color: #555;
+        }
+
+        /* ===== SUPPORT NOTICE BOX ===== */
+        .support-notice {
+            margin-top: 14px;
+            padding: 14px 16px;
+            background: #0f1a24;
+            border: 1px solid #1d9bf0;
+            border-radius: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .support-notice .notice-icon {
+            color: #1d9bf0;
+            font-size: 20px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .support-notice .notice-text {
+            color: #c9d1d9;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+        .support-notice .notice-text strong {
+            color: #1d9bf0;
+            font-weight: 600;
+        }
+        .support-notice .notice-email {
+            display: inline-block;
+            margin-top: 6px;
+            color: #1d9bf0;
+            font-family: monospace;
+            font-size: 13px;
+            background: #0a0a0a;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid #2f3336;
+            cursor: pointer;
+            user-select: all;
+        }
+
+        .save-btn {
+            background: #2f3336;
+            border: none;
+            color: #e7e9ea;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 14px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .save-btn:hover {
+            background: #3d4144;
+        }
+
+        .warning-message {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #1f1a0f;
+            border-left: 4px solid #f7b731;
+            border-radius: 10px;
+            color: #f7b731;
+            font-size: 14px;
+            display: none;
+        }
+        .warning-message.show {
+            display: block;
+        }
+        .warning-message i {
+            margin-right: 8px;
+        }
+
+        .confirmation-message {
+            margin-top: 8px;
+            padding: 12px 14px;
+            background: #0f1f0f;
+            border-left: 4px solid #1d9bf0;
+            border-radius: 10px;
+            color: #1d9bf0;
+            font-size: 14px;
+            display: none;
+        }
+        .confirmation-message.show {
+            display: block;
+        }
+
+        /* ===== LOCK OVERLAY ===== */
+        .posts-lock-overlay {
+            background: #0f0f0f;
+            border-radius: 16px;
+            border: 1px solid #2f3336;
+            padding: 18px 14px;
+            margin: 16px 0 4px 0;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .posts-lock-overlay.unlocked {
+            display: none;
+        }
+
+        .posts-lock-overlay .lock-icon {
+            font-size: 28px;
+            color: #f7b731;
+            margin-bottom: 6px;
+        }
+
+        .posts-lock-overlay p {
+            color: #e7e9ea;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .posts-lock-overlay .sub-text {
+            color: #71767b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .buy-subscription-btn {
+            background: #1d9bf0;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .buy-subscription-btn:hover {
+            background: #1a8cd8;
+            transform: scale(0.97);
+        }
+
+        /* ===== TWEETS ===== */
+        .tweets-section {
+            padding: 0 16px 16px 16px;
+            margin-top: 6px;
+        }
+
+        .tweet-item {
+            display: flex;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #2f3336;
+            filter: blur(8px);
+            opacity: 0.3;
+            pointer-events: none;
+            user-select: none;
+            transition: 0.3s;
+            position: relative;
+        }
+        .tweet-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .tweet-item.unlocked {
+            filter: blur(0);
+            opacity: 1;
+            pointer-events: auto;
+            user-select: auto;
+        }
+
+        .tweet-item.pro-unlocked .tweet-text {
+            font-weight: 500;
+        }
+
+        .hd-badge {
+            display: none;
+            background: #f7b731;
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .tweet-item.pro-unlocked .hd-badge {
+            display: inline-block;
+        }
+
+        .premium-content-badge {
+            display: none;
+            background: #f7b731;
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        .tweet-item.premium-content-unlocked .premium-content-badge {
+            display: inline-block;
+        }
+
+        .download-btn {
+            display: none;
+            background: #1d9bf0;
+            border: none;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 8px;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .download-btn:hover {
+            background: #1a8cd8;
+        }
+        .tweet-item.download-unlocked .download-btn {
+            display: inline-flex;
+        }
+
+        /* ===== MEDIA PROTECTION ===== */
+        .media-protect {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .media-protect img,
+        .media-protect video {
+            width: 100%;
+            border-radius: 16px;
+            display: block;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+            pointer-events: auto;
+        }
+
+        .media-protect .media-shield {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: transparent;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .media-protect + .download-btn {
+            position: relative;
+            z-index: 3;
+        }
+
+        .tweet-item.privacy-blur .media-protect img,
+        .tweet-item.privacy-blur .media-protect video {
+            filter: blur(18px) brightness(0.4);
+        }
+
+        .media-watermark {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.18;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 4px rgba(0,0,0,0.8);
+            letter-spacing: 1px;
+            white-space: nowrap;
+            transform: rotate(-18deg);
+            text-align: center;
+        }
+
+        .tweet-avatar-mini {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #1d9bf0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .tweet-avatar-mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+        }
+
+        .tweet-content {
+            flex: 1;
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tweet-name {
+            font-weight: 700;
+            color: #e7e9ea;
+            font-size: 15px;
+        }
+
+        .tweet-dot {
+            color: #71767b;
+        }
+
+        .tweet-time {
+            color: #71767b;
+            font-size: 14px;
+        }
+
+        .tweet-text {
+            color: #e7e9ea;
+            font-size: 15px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .success-unlock {
+            margin-top: 12px;
+            padding: 12px;
+            background: #0f1f0f;
+            border-radius: 12px;
+            border: 1px solid #1d9bf0;
+            color: #1d9bf0;
+            text-align: center;
+            display: none;
+        }
+        .success-unlock.show {
+            display: block;
+        }
+
+        .access-level-badge {
+            display: inline-block;
+            margin-left: 8px;
+            background: #1d9bf0;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            vertical-align: middle;
+        }
+        .access-level-badge.basic { background: #71767b; }
+        .access-level-badge.pro { background: #1d9bf0; }
+        .access-level-badge.yearly { background: #00ba7c; }
+        .access-level-badge.premium { background: #f7b731; color: #000; }
+        .access-level-badge.expired { background: #f4212e; }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 550px) {
+            .avatar {
+                width: 90px;
+                height: 90px;
+            }
+            .plan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== ANIMATED FULL-PAGE BACKGROUND ===== -->
+<div class="page-bg" id="pageBg"></div>
+
+<div class="profile-card">
+
+    <!-- ===== COVER IMAGE ===== -->
+    <div class="cover-image"></div>
+
+    <!-- ===== AVATAR / PROFILE PICTURE ===== -->
+    <div class="avatar-wrapper">
+        <div class="avatar">
+            <img src="1 (25).jpg" alt="Profile picture" id="profileImg" draggable="false" oncontextmenu="return false;" />
+            <span class="fallback-icon"><i class="fas fa-user"></i></span>
+        </div>
+    </div>
+
+    <!-- ===== USER INFO ===== -->
+    <div class="user-info">
+        <div class="display-name">
+            Alina Kovaceva
+            <span class="verified-badge"><i class="fas fa-check-circle"></i></span>
+            <span class="access-level-badge basic" id="accessLevelBadge">Basic</span>
+        </div>
+        <div class="bio bio-collapsed" id="bioText">
+            Content Creator · Model
+            <br /><br />
+            In today's digital age, the role of a female model has evolved far beyond simply posing for photographs. She has become a multifaceted creative force — a model, a brand ambassador, and above all, a content creator who shapes narratives and connects with audiences on a deeply personal level.
+            <br /><br />
+            As a model, she brings artistry to every frame. Whether she is walking a runway, shooting an editorial spread, or collaborating with a photographer on a conceptual project, her ability to embody emotion and tell a story through movement and expression is what sets her apart. She understands light, angles, and composition, but more importantly, she understands how to make an image feel alive.
+            <br /><br />
+            Yet what truly defines the modern female model is her role as a content creator. With the rise of social media platforms, she is no longer a passive subject — she is the director of her own narrative. She conceptualizes ideas, plans shoots, writes captions, edits videos, and engages directly with her community. Her Instagram feed or TikTok channel becomes a curated extension of her personality: part portfolio, part diary, part brand.
+            <br /><br />
+            This dual identity requires a remarkable skill set. She must be creative and strategic, confident and vulnerable, disciplined and spontaneous. Behind every polished post lies hours of planning — mood boards, location scouting, outfit coordination, lighting setups, and retakes. She balances aesthetics with authenticity, knowing that her audience craves realness as much as beauty.
+            <br /><br />
+            Beyond the creative labor, she is also an entrepreneur. She negotiates brand partnerships, manages her own schedule, and builds a personal brand that reflects her values. Many female models use their platforms to advocate for causes they believe in — body positivity, mental health awareness, sustainability, or women's empowerment — turning their influence into meaningful impact.
+            <br /><br />
+            The life of a female model and content creator is not simply glamorous; it is demanding, deliberate, and deeply creative. She is a storyteller, a businesswoman, and an artist — redefining what it means to be seen, heard, and remembered in a world that never stops scrolling.
+        </div>
+        
+        <button class="bio-toggle-btn" id="bioToggleBtn">
+            <span>Load more</span> <i class="fas fa-chevron-down"></i>
+        </button>
+
+        <div class="info-divider"></div>
+    </div>
+
+    <!-- ===== SUBSCRIPTION STATUS PANEL ===== -->
+    <div class="subscription-status" id="subscriptionStatus">
+        <div class="status-header">
+            <i class="fas fa-id-card" style="color:#1d9bf0;"></i> Your Subscription
+        </div>
+        <div class="status-row">
+            <span class="label">Current plan</span>
+            <span class="value"><span class="plan-badge" id="statusPlanBadge">Basic</span></span>
+        </div>
+        <div class="status-row">
+            <span class="label">Started on</span>
+            <span class="value" id="statusStartDate">—</span>
+        </div>
+        <div class="status-row">
+            <span class="label">Expires on</span>
+            <span class="value" id="statusExpiryDate">—</span>
+        </div>
+        <div class="status-row">
+            <span class="label">Time remaining</span>
+            <span class="value remaining good" id="statusRemaining">—</span>
+        </div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div>
+        </div>
+
+        <div class="expiry-alert" id="expiryAlert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Your subscription has expired. Access has been revoked.</span>
+        </div>
+
+        <button class="renew-btn" id="renewBtn">
+            <i class="fas fa-sync-alt"></i> Renew subscription
+        </button>
+    </div>
+
+    <!-- ===== REOPEN PRICING BUTTON ===== -->
+    <button class="reopen-pricing-btn" id="reopenPricingBtn">
+        <i class="fas fa-crown"></i> Show plans & pricing
+    </button>
+
+    <!-- ===== PRICING PLANS ===== -->
+    <div class="pricing-section" id="pricingSection">
+        <button class="pricing-close-btn" id="closePricingBtn" title="Hide plans (temporary)">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="pricing-title">
+            <i class="fas fa-crown"></i> Choose your plan
+        </div>
+
+        <div class="plan-grid">
+            <div class="plan-card" data-plan="basic">
+                <div class="plan-name">Basic</div>
+                <div class="plan-price">$0 <small>/mo</small></div>
+                <div class="plan-feature">Preview only</div>
+            </div>
+            <div class="plan-card" data-plan="pro">
+                <div class="plan-name">Pro</div>
+                <div class="plan-price">$9 <small>/mo</small></div>
+                <div class="plan-feature">All posts</div>
+            </div>
+            <div class="plan-card" data-plan="yearly">
+                <div class="plan-name">Yearly</div>
+                <div class="plan-price">$89 <small>/yr</small></div>
+                <div class="plan-feature">Pro + 20% off</div>
+            </div>
+            <div class="plan-card premium-highlight" data-plan="premium">
+                <div class="plan-name"><i class="fas fa-star" style="color:#f7b731;"></i> Premium</div>
+                <div class="plan-price">$149 <small>/yr</small></div>
+                <div class="plan-feature">Exclusive + downloads</div>
+            </div>
+        </div>
+
+        <button class="buy-btn" id="buyPlanBtn">
+            <i class="fas fa-lock"></i> Buy Plan & unlock posts
+        </button>
+
+        <!-- ===== PAYMENT DETAILS ===== -->
+        <div class="payment-details" id="paymentDetails">
+
+            <!-- Crypto-only notice -->
+            <div class="crypto-notice">
+                <i class="fas fa-coins"></i>
+                <div>
+                    <strong>Crypto payments only.</strong> We accept <strong>USDT</strong> only. No credit card, PayPal, or bank transfer.
+                </div>
+            </div>
+
+            <label><i class="fas fa-dollar-sign" style="color:#26a17b;"></i> USDT — choose network</label>
+
+            <!-- Network tabs -->
+            <div class="network-tabs" id="networkTabs">
+                <button type="button" class="network-tab active" data-network="evm">
+                    <i class="fas fa-link"></i> EVM
+                </button>
+                <button type="button" class="network-tab" data-network="trc20">
+                    <i class="fas fa-bolt"></i> TRC20
+                </button>
+            </div>
+
+            <!-- EVM address -->
+            <div id="evmAddressBlock">
+                <div class="address-box" data-copy-address>
+                    <span>0xdF86AEFca5F169171baec43D5A01625Aa593cDBb</span>
+                    <i class="fas fa-copy"></i>
+                </div>
+                <div class="network-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>EVM networks supported:</strong> Ethereum (ERC20), BNB Chain (BEP20), Polygon, Arbitrum, Optimism, Base, and other EVM-compatible chains.
+                        <br>Before sending, make sure the network you selected in your wallet is an <strong>EVM network</strong> and matches USDT.
+                    </div>
+                </div>
+                <div class="network-warning danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Do NOT send via TRC20 to this address.</strong> TRON (TRC20) addresses start with <code>T</code> and are not EVM-compatible. Use the TRC20 tab for TRON.
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRC20 address -->
+            <div id="trc20AddressBlock" style="display:none;">
+                <div class="address-box" data-copy-address>
+                    <span>TNJAs22K7rSVGQGpkiK9rNeo1GtyY3C9Xu</span>
+                    <i class="fas fa-copy"></i>
+                </div>
+                <div class="network-warning">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>TRON network (TRC20) only.</strong> Send USDT on the TRON network to this address. Do not use ERC20/BEP20 for this address.
+                    </div>
+                </div>
+            </div>
+
+            <label><i class="fas fa-receipt"></i> Transaction receipt (TXID / hash)</label>
+            <input class="receipt-input" type="text" placeholder="Paste your transaction ID..." id="receiptInput" />
+
+            <label><i class="fas fa-key"></i> Your access key <span style="color:#71767b; font-weight:400; font-size:12px;">(Pro / Yearly / Premium)</span></label>
+            <input class="access-input" type="text" placeholder="Paste access key..." id="accessKeyInput" />
+
+            <div class="support-notice">
+                <i class="fas fa-envelope-open-text notice-icon"></i>
+                <div class="notice-text">
+                    After completing your transaction, <strong>send your transaction receipt to the support email below</strong> so that your transaction is registered and your access key is issued to you.
+                    <br />
+                    <span class="notice-email" title="Click to copy">alinakovaceva1@gmail.com</span>
+                </div>
+            </div>
+
+            <div class="warning-message" id="warningMessage">
+                <i class="fas fa-exclamation-triangle"></i> This access key is single-use and can only be used on one device. Are you sure you want to use it?
+            </div>
+
+            <div class="confirmation-message" id="confirmationMessage">
+                <i class="fas fa-check-circle"></i> Access key verified. Content unlocked.
+            </div>
+
+            <button class="save-btn" id="saveInfoBtn">
+                <i class="fas fa-save"></i> Save & Verify
+            </button>
+            <div style="margin-top:6px; font-size:12px; color:#444;">
+                <i class="fas fa-info-circle"></i> Enter your access key and click Save & Verify.
+            </div>
+        </div>
+
+        <!-- ===== LOCK OVERLAY ===== -->
+        <div class="posts-lock-overlay" id="lockOverlay">
+            <div class="lock-icon"><i class="fas fa-lock"></i></div>
+            <p>🔒 To view this content, you need a subscription</p>
+            <div class="sub-text">Purchase a plan or enter your access key above.</div>
+            <button class="buy-subscription-btn" id="buySubBtn">
+                <i class="fas fa-shopping-cart"></i> Buy Subscription
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== TWEETS (rendered from POSTS array) ===== -->
+    <div class="tweets-section" id="tweetsSection">
+        <div class="success-unlock" id="successUnlock">
+            <i class="fas fa-check-circle" style="margin-right:8px;"></i> Content unlocked successfully!
+        </div>
+    </div>
+</div>
+
+<!-- ===== WELCOME TOAST ===== -->
+<div class="welcome-toast" id="welcomeToast">
+    <div class="toast-title" id="toastTitle"><i class="fas fa-gift"></i> Congratulations!</div>
+    <div class="toast-sub" id="toastSub">Your plan has been activated.</div>
+</div>
+
+<script>
+    (function() {
+        // ===== POSTS ARRAY — ADD NEW POSTS HERE =====
+        // type: "video" | "image"
+        // src: relative path to media file
+        // text: post caption
+        // premium: true = show Premium badge (exclusive content)
+        // download: true = show download button (only effective for Premium plan)
+        // IMPORTANT: every item MUST end with a comma (except optionally the last one)
+        const POSTS = [
+            { type: 'image', src: 'onlyfans/1.jpg', text: '😍', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/2.webp', text: '', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/3.jpg', text: '💎 exclusive pic just for you 💎', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/4.mp4', text: '🥵 watch till the end 🥵', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/5.webp', text: '🔞', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/6.jpg', text: '💯 premium shot, no filters 💯', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/7.mp4', text: '😈', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/8.jpeg', text: '', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/9.mp4', text: '🤑 new exclusive clip, don’t miss it 🤑', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/10.jpeg', text: '🤍', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/11.mp4', text: '😎', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/12.jpg', text: '💜 private gallery unlocked for members 💜', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/13.jpeg', text: '👄', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/14.jpeg', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/15.jpeg', text: '🧡', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/16.jpeg', text: '💀 members only, sorry 💀', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/17.jpeg', text: '🙏', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/18.jpeg', text: '💚 exclusive pic drop 💚', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/19.jpg', text: '', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/20.webp', text: '😍', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/21.jpeg', text: '🔞 premium only, 18+ 🔞', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/22.jpeg', text: '💙', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/23.jpeg', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/24.jpeg', text: '💎', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/25.jpg', text: '🥶 cold shot, hot vibe 🥶', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/26.jpeg', text: '👾', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/27.jpeg', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/28.jpg', text: '☠ subscriber exclusive ☠', premium: true, download: true },
+            { type: 'image', src: 'on;yfans/29.jpeg', text: '🤍', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/30.jpeg', text: '💛', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/31.jpeg', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/32.jpg', text: '💯', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/33.jpeg', text: '😈 locked pic for premium 😈', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/34.mp4', text: '👹', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/35.mp4', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/36.webp', text: '💜', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/37.mp4', text: '😎', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/38.jpeg', text: '', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/39.jpeg', text: '🔞 exclusive pic, members only 🔞', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/40.jpg', text: '🤎', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/41.jpg', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/42.jpeg', text: '😨', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/43.jpeg', text: '💚', premium: true, download: true },
+            { type: 'video', src: 'onlyfans/44.mp4', text: '🥵 full video for subscribers 🥵', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/45.jpeg', text: '🖤', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/46.jpeg', text: '', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/47.jpg', text: '🙏', premium: false, download: false },
+            { type: 'image', src: 'onlyfans/48.jpeg', text: '💎', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/49.jpeg', text: '☠ last exclusive, enjoy ☠', premium: true, download: true },
+            { type: 'image', src: 'onlyfans/50.jpg', text: '😈 locked pic for premium 😈', premium: true, download: true }
+
+        ];        // ===== RANDOM BLURRED FULL-PAGE BACKGROUND =====
+        const bgImages = POSTS
+            .filter(post => post.type === 'image')
+            .map(post => post.src);
+
+        const pageBg = document.getElementById('pageBg');
+        let lastIndex = -1;
+
+        function setRandomBackground() {
+            if (!pageBg || bgImages.length === 0) return;
+            let newIndex;
+            if (bgImages.length === 1) {
+                newIndex = 0;
+            } else {
+                do {
+                    newIndex = Math.floor(Math.random() * bgImages.length);
+                } while (newIndex === lastIndex);
+            }
+            lastIndex = newIndex;
+            const fullPath = bgImages[newIndex];
+            pageBg.classList.add('fading');
+            setTimeout(() => {
+                pageBg.style.backgroundImage = `url("${fullPath}")`;
+                requestAnimationFrame(() => {
+                    pageBg.classList.remove('fading');
+                });
+            }, 1000);
+        }
+
+        setRandomBackground();
+        setInterval(setRandomBackground, 10000);
+
+        // ===== ELEMENT REFERENCES =====
+        const buyBtn = document.getElementById('buyPlanBtn');
+        const paymentDiv = document.getElementById('paymentDetails');
+        const buySubBtn = document.getElementById('buySubBtn');
+        const saveBtn = document.getElementById('saveInfoBtn');
+        const receiptInput = document.getElementById('receiptInput');
+        const accessKeyInput = document.getElementById('accessKeyInput');
+        const warningMessage = document.getElementById('warningMessage');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const lockOverlay = document.getElementById('lockOverlay');
+        const successUnlock = document.getElementById('successUnlock');
+        const accessLevelBadge = document.getElementById('accessLevelBadge');
+
+        const pricingSection = document.getElementById('pricingSection');
+        const closePricingBtn = document.getElementById('closePricingBtn');
+        const reopenPricingBtn = document.getElementById('reopenPricingBtn');
+
+        const subscriptionStatus = document.getElementById('subscriptionStatus');
+        const statusPlanBadge = document.getElementById('statusPlanBadge');
+        const statusStartDate = document.getElementById('statusStartDate');
+        const statusExpiryDate = document.getElementById('statusExpiryDate');
+        const statusRemaining = document.getElementById('statusRemaining');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const expiryAlert = document.getElementById('expiryAlert');
+        const renewBtn = document.getElementById('renewBtn');
+
+        const welcomeToast = document.getElementById('welcomeToast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastSub = document.getElementById('toastSub');
+
+        // Network tabs
+        const networkTabs = document.querySelectorAll('.network-tab');
+        const evmAddressBlock = document.getElementById('evmAddressBlock');
+        const trc20AddressBlock = document.getElementById('trc20AddressBlock');
+
+        // ===== ACCESS KEYS PER PLAN =====
+        const ACCESS_KEYS = {
+            'PRO-KEY-8fG7hJkL9mNpQrStUvWxYzAbCdEfGhIjKlMnOpQrS': 'pro',
+            'YEARLY-KEY-9xT4bV2cR6mK1pL8nQ3wZ5yH7jF0dS4aG6eI': 'yearly',
+            'PREMIUM-KEY-3pQ7rS9tV1wX5yZ8aB2cD4eF6gH0iJ1kL': 'premium'
+        };
+
+        // ===== PLAN FEATURES + DURATION (days) =====
+        const PLAN_FEATURES = {
+            basic:   { label: 'Basic',   badgeClass: 'basic',   unlockAll: false,   premiumContent: false, download: false, durationDays: 0 },
+            pro:     { label: 'Pro',     badgeClass: 'pro',     unlockAll: true,    premiumContent: false, download: false, durationDays: 30 },
+            yearly:  { label: 'Yearly',  badgeClass: 'yearly',  unlockAll: true,    premiumContent: false, download: false, durationDays: 365 },
+            premium: { label: 'Premium', badgeClass: 'premium', unlockAll: true,    premiumContent: true,  download: true,  durationDays: 365 }
+        };
+
+        let currentPlan = 'basic';
+        let isUnlocked = false;
+        let subscriptionStart = null;
+        let subscriptionExpiry = null;
+        let expiryCheckInterval = null;
+        let privacyBlurTimer = null;
+
+        // ===== NETWORK TABS =====
+        networkTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                networkTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const net = this.getAttribute('data-network');
+                if (net === 'evm') {
+                    evmAddressBlock.style.display = '';
+                    trc20AddressBlock.style.display = 'none';
+                } else {
+                    evmAddressBlock.style.display = 'none';
+                    trc20AddressBlock.style.display = '';
+                }
+            });
+        });
+
+        // ===== RENDER POSTS =====
+        function buildMediaHTML(post) {
+            if (post.type === 'video') {
+                return `
+                    <div class="media-protect">
+                        <video controls controlslist="nodownload noremoteplayback" disablepictureinpicture oncontextmenu="return false;">
+                            <source src="${post.src}" type="video/mp4" />
+                            مرورگر شما فیلم رو پشتیبانی نمیکنه
+                        </video>
+                        <div class="media-shield"></div>
+                        <div class="media-watermark" data-watermark>Alina K. · @alinakov</div>
+                    </div>`;
+            }
+            return `
+                <div class="media-protect">
+                    <img src="${post.src}" alt="Post media" draggable="false" oncontextmenu="return false;" />
+                    <div class="media-shield"></div>
+                    <div class="media-watermark" data-watermark>Alina K. · @alinakov</div>
+                </div>`;
+        }
+
+        function buildDownloadBtn(post) {
+            if (!post.download) return '';
+            return `
+                <button class="download-btn" data-src="${post.src}" data-type="${post.type}">
+                    <i class="fas fa-download"></i> Download ${post.type}
+                </button>`;
+        }
+
+        function renderPosts() {
+            const section = document.getElementById('tweetsSection');
+            const successEl = document.getElementById('successUnlock');
+
+            section.querySelectorAll('.tweet-item').forEach(el => el.remove());
+
+            POSTS.forEach((post, i) => {
+                const item = document.createElement('div');
+                item.className = 'tweet-item';
+                item.id = 'tweet-' + i;
+                item.innerHTML = `
+                    <div class="tweet-avatar-mini">
+                        <img src="4.png" alt="A" draggable="false" oncontextmenu="return false;" />
+                    </div>
+                    <div class="tweet-content">
+                        <div class="tweet-header">
+                            <span class="tweet-name">Alina Kovaceva</span>
+                            <span class="tweet-dot"></span>
+                            <span class="tweet-time"></span>
+                            <span class="hd-badge">HD</span>
+                            ${post.premium ? '<span class="premium-content-badge">Premium</span>' : ''}
+                        </div>
+                        <div class="tweet-text">${post.text || ''}</div>
+                        ${buildMediaHTML(post)}
+                        ${buildDownloadBtn(post)}
+                    </div>`;
+                section.insertBefore(item, successEl);
+            });
+
+            applyPlanClasses(currentPlan);
+            bindDownloadButtons();
+            updateWatermarks();
+        }
+
+        function applyPlanClasses(plan) {
+            const features = PLAN_FEATURES[plan] || PLAN_FEATURES.basic;
+            document.querySelectorAll('.tweet-item').forEach(item => {
+                item.classList.toggle('unlocked', !!features.unlockAll);
+                item.classList.toggle('pro-unlocked', !!features.hd);
+                const isPremiumPost = !!item.querySelector('.premium-content-badge');
+                item.classList.toggle('premium-content-unlocked', !!features.premiumContent && isPremiumPost);
+                item.classList.toggle('download-unlocked', !!features.download);
+            });
+        }
+
+        function bindDownloadButtons() {
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                if (btn.dataset.bound) return;
+                btn.dataset.bound = '1';
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const planFeatures = PLAN_FEATURES[currentPlan];
+                    if (!planFeatures || !planFeatures.download) return;
+                    const src = this.getAttribute('data-src');
+                    if (!src) return;
+                    const a = document.createElement('a');
+                    a.href = src;
+                    a.download = src.split('/').pop() || 'download';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                });
+            });
+        }
+
+        // ===== PRICING SECTION CLOSE / REOPEN =====
+        closePricingBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            pricingSection.classList.add('hidden');
+            reopenPricingBtn.classList.add('show');
+        });
+
+        reopenPricingBtn.addEventListener('click', function() {
+            pricingSection.classList.remove('hidden');
+            reopenPricingBtn.classList.remove('show');
+        });
+
+        // ===== SELECT PLAN CARD =====
+        document.querySelectorAll('.plan-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // ===== TOGGLE PAYMENT DETAILS =====
+        buyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            paymentDiv.classList.toggle('show');
+            if (paymentDiv.classList.contains('show')) {
+                buyBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide payment details';
+            } else {
+                buyBtn.innerHTML = '<i class="fas fa-lock"></i> Buy Plan & unlock posts';
+            }
+        });
+
+        buySubBtn.addEventListener('click', function() {
+            if (pricingSection.classList.contains('hidden')) {
+                pricingSection.classList.remove('hidden');
+                reopenPricingBtn.classList.remove('show');
+            }
+            if (pricingSection) {
+                pricingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (!paymentDiv.classList.contains('show')) {
+                paymentDiv.classList.add('show');
+                buyBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide payment details';
+            }
+        });
+
+        if (renewBtn) {
+            renewBtn.addEventListener('click', function() {
+                if (pricingSection.classList.contains('hidden')) {
+                    pricingSection.classList.remove('hidden');
+                    reopenPricingBtn.classList.remove('show');
+                }
+                pricingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (!paymentDiv.classList.contains('show')) {
+                    paymentDiv.classList.add('show');
+                    buyBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide payment details';
+                }
+            });
+        }
+
+        // ===== COPY ADDRESS =====
+        document.querySelectorAll('.address-box').forEach(box => {
+            box.addEventListener('click', function() {
+                const addr = this.querySelector('span')?.innerText;
+                if (addr) {
+                    navigator.clipboard?.writeText(addr).then(() => {
+                        const icon = this.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fas fa-check';
+                            setTimeout(() => { icon.className = 'fas fa-copy'; }, 1500);
+                        }
+                    }).catch(() => {});
+                }
+            });
+        });
+
+        // Copy support email
+        const noticeEmail = document.querySelector('.notice-email');
+        if (noticeEmail) {
+            noticeEmail.addEventListener('click', function() {
+                const email = this.innerText.trim();
+                navigator.clipboard?.writeText(email).then(() => {
+                    const original = this.innerText;
+                    this.innerText = '✓ Copied!';
+                    setTimeout(() => { this.innerText = original; }, 1500);
+                }).catch(() => {});
+            });
+        }
+
+        // ===== SHOW WELCOME TOAST =====
+        function showWelcomeToast(plan, expiryDate) {
+            const features = PLAN_FEATURES[plan];
+            const daysLeft = Math.ceil((expiryDate - Date.now()) / (1000 * 60 * 60 * 24));
+            const expiryStr = new Date(expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+            welcomeToast.classList.remove('premium-toast', 'yearly-toast', 'expired-toast');
+            if (plan === 'premium') {
+                welcomeToast.classList.add('premium-toast');
+                toastTitle.innerHTML = '<i class="fas fa-crown"></i> 🎉 Premium Activated!';
+            } else if (plan === 'yearly') {
+                welcomeToast.classList.add('yearly-toast');
+                toastTitle.innerHTML = '<i class="fas fa-star"></i> 🎉 Yearly Plan Activated!';
+            } else {
+                toastTitle.innerHTML = '<i class="fas fa-gift"></i> 🎉 Pro Plan Activated!';
+            }
+
+            toastSub.innerHTML = `Congratulations! Your <strong>${features.label}</strong> plan is now active.<br>
+                Valid until <strong>${expiryStr}</strong> — <strong>${daysLeft} day${daysLeft !== 1 ? 's' : ''}</strong> remaining.`;
+
+            welcomeToast.classList.add('show');
+            setTimeout(() => {
+                welcomeToast.classList.remove('show');
+            }, 6000);
+        }
+
+        // ===== SHOW EXPIRY TOAST =====
+        function showExpiryToast() {
+            welcomeToast.classList.remove('premium-toast', 'yearly-toast');
+            welcomeToast.classList.add('expired-toast');
+            toastTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Subscription Expired';
+            toastSub.innerHTML = 'Your subscription has ended. Access has been revoked.<br>Please renew to continue.';
+            welcomeToast.classList.add('show');
+            setTimeout(() => {
+                welcomeToast.classList.remove('show');
+            }, 7000);
+        }
+
+        // ===== UPDATE SUBSCRIPTION STATUS PANEL =====
+        function updateSubscriptionStatusPanel(plan, start, expiry) {
+            if (!plan || plan === 'basic' || !start || !expiry) {
+                subscriptionStatus.classList.remove('show');
+                return;
+            }
+
+            const features = PLAN_FEATURES[plan];
+            const now = Date.now();
+            const totalMs = expiry - start;
+            const remainingMs = Math.max(0, expiry - now);
+            const daysLeft = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+            const percentUsed = totalMs > 0 ? Math.min(100, Math.max(0, ((totalMs - remainingMs) / totalMs) * 100)) : 100;
+            const isExpired = now >= expiry;
+
+            subscriptionStatus.classList.add('show');
+            subscriptionStatus.classList.toggle('expired-panel', isExpired);
+
+            statusPlanBadge.textContent = features.label;
+            statusPlanBadge.className = 'plan-badge ' + features.badgeClass;
+
+            statusStartDate.textContent = new Date(start).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            statusExpiryDate.textContent = new Date(expiry).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+            if (isExpired) {
+                statusRemaining.textContent = 'Expired';
+                statusRemaining.className = 'value remaining danger';
+                expiryAlert.classList.add('show');
+                renewBtn.classList.add('show');
+            } else if (daysLeft <= 3) {
+                statusRemaining.textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left ⚠️`;
+                statusRemaining.className = 'value remaining danger';
+                expiryAlert.classList.remove('show');
+                renewBtn.classList.remove('show');
+            } else if (daysLeft <= 7) {
+                statusRemaining.textContent = `${daysLeft} days left`;
+                statusRemaining.className = 'value remaining warning';
+                expiryAlert.classList.remove('show');
+                renewBtn.classList.remove('show');
+            } else {
+                statusRemaining.textContent = `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left`;
+                statusRemaining.className = 'value remaining good';
+                expiryAlert.classList.remove('show');
+                renewBtn.classList.remove('show');
+            }
+
+            progressBarFill.style.width = percentUsed + '%';
+            if (isExpired) {
+                progressBarFill.style.background = '#f4212e';
+            } else if (daysLeft <= 3) {
+                progressBarFill.style.background = 'linear-gradient(90deg, #f4212e, #f7b731)';
+            } else if (daysLeft <= 7) {
+                progressBarFill.style.background = 'linear-gradient(90deg, #f7b731, #1d9bf0)';
+            } else {
+                progressBarFill.style.background = 'linear-gradient(90deg, #1d9bf0, #00ba7c)';
+            }
+        }
+
+        // ===== MARK ACTIVE PLAN CARD =====
+        function markActivePlanCard(plan) {
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.classList.remove('active-plan');
+                if (card.getAttribute('data-plan') === plan && plan !== 'basic') {
+                    card.classList.add('active-plan');
+                }
+            });
+        }
+
+        // ===== LOCK CONTENT =====
+        function lockContent(reason) {
+            isUnlocked = false;
+            currentPlan = 'basic';
+
+            accessLevelBadge.textContent = 'Basic';
+            accessLevelBadge.className = 'access-level-badge basic';
+
+            document.querySelectorAll('.tweet-item').forEach(item => {
+                item.classList.remove('unlocked', 'pro-unlocked', 'premium-content-unlocked', 'download-unlocked', 'privacy-blur');
+            });
+
+            lockOverlay.classList.remove('unlocked');
+            successUnlock.classList.remove('show');
+
+            markActivePlanCard('basic');
+
+            accessKeyInput.disabled = false;
+            accessKeyInput.value = '';
+            saveBtn.disabled = false;
+            saveBtn.style.opacity = '';
+            saveBtn.style.cursor = '';
+            confirmationMessage.classList.remove('show');
+            warningMessage.classList.remove('show');
+
+            try {
+                localStorage.removeItem('contentUnlocked');
+                localStorage.removeItem('usedKey');
+            } catch(e) {}
+
+            if (expiryCheckInterval) {
+                clearInterval(expiryCheckInterval);
+                expiryCheckInterval = null;
+            }
+
+            if (reason === 'expired') {
+                showExpiryToast();
+            }
+        }
+
+        // ===== START EXPIRY CHECKER =====
+        function startExpiryChecker() {
+            if (expiryCheckInterval) clearInterval(expiryCheckInterval);
+            expiryCheckInterval = setInterval(() => {
+                if (subscriptionExpiry && Date.now() >= subscriptionExpiry && isUnlocked) {
+                    lockContent('expired');
+                    const planForPanel = localStorage.getItem('currentPlan') || 'basic';
+                    if (planForPanel !== 'basic' && subscriptionStart && subscriptionExpiry) {
+                        currentPlan = planForPanel;
+                        updateSubscriptionStatusPanel(planForPanel, subscriptionStart, subscriptionExpiry);
+                        markActivePlanCard(planForPanel);
+                    }
+                }
+            }, 30000);
+        }
+
+        // ===== UNLOCK CONTENT =====
+        function unlockContent(plan, options = {}) {
+            const features = PLAN_FEATURES[plan] || PLAN_FEATURES.basic;
+            const isNewActivation = !isUnlocked;
+
+            currentPlan = plan;
+
+            accessLevelBadge.textContent = features.label;
+            accessLevelBadge.className = 'access-level-badge ' + features.badgeClass;
+
+            applyPlanClasses(plan);
+
+            lockOverlay.classList.add('unlocked');
+            successUnlock.classList.add('show');
+            successUnlock.innerHTML = `<i class="fas fa-check-circle" style="margin-right:8px;"></i> ${features.label} plan activated! Content unlocked.`;
+
+            isUnlocked = true;
+
+            if (isNewActivation && plan !== 'basic') {
+                if (options.start) {
+                    subscriptionStart = options.start;
+                    subscriptionExpiry = options.expiry;
+                } else {
+                    subscriptionStart = Date.now();
+                    subscriptionExpiry = subscriptionStart + features.durationDays * 24 * 60 * 60 * 1000;
+                }
+            }
+
+            updateSubscriptionStatusPanel(plan, subscriptionStart, subscriptionExpiry);
+            markActivePlanCard(plan);
+
+            try {
+                localStorage.setItem('contentUnlocked', 'true');
+                localStorage.setItem('currentPlan', plan);
+                if (subscriptionStart) localStorage.setItem('subscriptionStart', String(subscriptionStart));
+                if (subscriptionExpiry) localStorage.setItem('subscriptionExpiry', String(subscriptionExpiry));
+            } catch(e) {}
+
+            if (isNewActivation && plan !== 'basic' && !options.skipToast) {
+                showWelcomeToast(plan, subscriptionExpiry);
+            }
+
+            if (plan !== 'basic' && subscriptionExpiry) {
+                startExpiryChecker();
+            }
+        }
+
+        // ===== SAVE & VERIFY =====
+        saveBtn.addEventListener('click', function() {
+            const key = accessKeyInput.value.trim();
+            const receipt = receiptInput.value.trim() || 'No receipt provided';
+
+            try {
+                localStorage.setItem('receipt', receipt);
+            } catch(e) {}
+
+            if (key === '') {
+                warningMessage.classList.remove('show');
+                confirmationMessage.classList.remove('show');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-times"></i> Enter a key';
+                saveBtn.style.background = '#8b0000';
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '#2f3336';
+                }, 2000);
+                return;
+            }
+
+            const plan = ACCESS_KEYS[key];
+
+            if (plan) {
+                if (!warningMessage.classList.contains('show')) {
+                    warningMessage.classList.add('show');
+                    confirmationMessage.classList.remove('show');
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fas fa-question-circle"></i> Are you sure?';
+                    setTimeout(() => {
+                        saveBtn.innerHTML = originalText;
+                    }, 3000);
+                    return;
+                }
+
+                if (warningMessage.classList.contains('show')) {
+                    if (isUnlocked) {
+                        confirmationMessage.classList.add('show');
+                        confirmationMessage.innerHTML = '<i class="fas fa-check-circle"></i> Already unlocked.';
+                        return;
+                    }
+
+                    unlockContent(plan);
+                    confirmationMessage.classList.add('show');
+                    confirmationMessage.innerHTML = `<i class="fas fa-check-circle"></i> ${PLAN_FEATURES[plan].label} access key verified. Content unlocked.`;
+                    warningMessage.classList.remove('show');
+
+                    try {
+                        localStorage.setItem('usedKey', key);
+                    } catch(e) {}
+
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> Verified!';
+                    setTimeout(() => {
+                        saveBtn.innerHTML = originalText;
+                    }, 2000);
+
+                    accessKeyInput.disabled = true;
+                    saveBtn.disabled = true;
+                    saveBtn.style.opacity = '0.6';
+                    saveBtn.style.cursor = 'default';
+                }
+            } else {
+                warningMessage.classList.remove('show');
+                confirmationMessage.classList.remove('show');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-times"></i> Invalid key';
+                saveBtn.style.background = '#8b0000';
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '#2f3336';
+                }, 2000);
+            }
+        });
+
+        // ===== MEDIA PROTECTION =====
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            const key = e.key.toLowerCase();
+            if ((e.ctrlKey || e.metaKey) && (key === 's' || key === 'u')) {
+                e.preventDefault();
+            }
+        });
+
+        // ===== SCREENSHOT DETERRENCE =====
+        function triggerPrivacyBlur(durationMs) {
+            if (!isUnlocked) return;
+            document.querySelectorAll('.tweet-item').forEach(item => item.classList.add('privacy-blur'));
+            if (privacyBlurTimer) clearTimeout(privacyBlurTimer);
+            privacyBlurTimer = setTimeout(() => {
+                document.querySelectorAll('.tweet-item').forEach(item => item.classList.remove('privacy-blur'));
+            }, durationMs || 1200);
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) triggerPrivacyBlur(1200);
+        });
+
+        window.addEventListener('blur', function() {
+            triggerPrivacyBlur(1200);
+        });
+
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                triggerPrivacyBlur(2000);
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText('Screenshots are not permitted on this content.').catch(() => {});
+                    }
+                } catch (err) {}
+            }
+        });
+
+        let lastResize = 0;
+        window.addEventListener('resize', function() {
+            const now = Date.now();
+            if (now - lastResize > 800) triggerPrivacyBlur(1000);
+            lastResize = now;
+        });
+
+        function updateWatermarks() {
+            const stamp = new Date().toLocaleString('en-US', { hour12: false });
+            document.querySelectorAll('[data-watermark]').forEach(el => {
+                el.textContent = `Alina K. · @alinakov · ${stamp}`;
+            });
+        }
+        setInterval(updateWatermarks, 30000);
+
+        // ===== INITIAL RENDER =====
+        renderPosts();
+
+        // ===== LOAD SAVED DATA =====
+        try {
+            const savedReceipt = localStorage.getItem('receipt');
+            if (savedReceipt) {
+                receiptInput.value = savedReceipt;
+            }
+
+            const savedPlan = localStorage.getItem('currentPlan');
+            const unlocked = localStorage.getItem('contentUnlocked');
+            const savedStart = localStorage.getItem('subscriptionStart');
+            const savedExpiry = localStorage.getItem('subscriptionExpiry');
+
+            if (savedStart && savedExpiry) {
+                subscriptionStart = parseInt(savedStart, 10);
+                subscriptionExpiry = parseInt(savedExpiry, 10);
+            }
+
+            const isSubscriptionExpired = subscriptionExpiry && Date.now() >= subscriptionExpiry;
+
+            if (savedPlan && savedPlan !== 'basic' && subscriptionStart && subscriptionExpiry) {
+                updateSubscriptionStatusPanel(savedPlan, subscriptionStart, subscriptionExpiry);
+
+                if (isSubscriptionExpired) {
+                    lockContent(null);
+                    currentPlan = savedPlan;
+                    updateSubscriptionStatusPanel(savedPlan, subscriptionStart, subscriptionExpiry);
+                    markActivePlanCard(savedPlan);
+                } else if (unlocked === 'true') {
+                    unlockContent(savedPlan, {
+                        start: subscriptionStart,
+                        expiry: subscriptionExpiry,
+                        skipToast: true
+                    });
+                    confirmationMessage.classList.add('show');
+                    confirmationMessage.innerHTML = '<i class="fas fa-check-circle"></i> Already unlocked.';
+                    accessKeyInput.disabled = true;
+                    saveBtn.disabled = true;
+                    saveBtn.style.opacity = '0.6';
+                    saveBtn.style.cursor = 'default';
+                }
+            }
+
+            const usedKey = localStorage.getItem('usedKey');
+            if (usedKey && ACCESS_KEYS[usedKey] && !isUnlocked && !isSubscriptionExpired) {
+                unlockContent(ACCESS_KEYS[usedKey], { skipToast: true });
+                confirmationMessage.classList.add('show');
+                confirmationMessage.innerHTML = '<i class="fas fa-check-circle"></i> Already unlocked.';
+                accessKeyInput.disabled = true;
+                saveBtn.disabled = true;
+                saveBtn.style.opacity = '0.6';
+                saveBtn.style.cursor = 'default';
+            }
+        } catch(e) {}
+
+        // ===== LIVE VALIDATION =====
+        accessKeyInput.addEventListener('input', function() {
+            const key = this.value.trim();
+            if (key && ACCESS_KEYS[key] && !isUnlocked) {
+                warningMessage.classList.add('show');
+                confirmationMessage.classList.remove('show');
+            } else {
+                warningMessage.classList.remove('show');
+            }
+        });
+
+        accessKeyInput.addEventListener('blur', function() {
+            const key = this.value.trim();
+            if (!key || !ACCESS_KEYS[key]) {
+                warningMessage.classList.remove('show');
+            }
+        });
+
+        // ===== UPDATE COUNTDOWN EVERY MINUTE =====
+        setInterval(() => {
+            if (subscriptionExpiry && subscriptionStart) {
+                const planForPanel = currentPlan !== 'basic'
+                    ? currentPlan
+                    : (localStorage.getItem('currentPlan') || 'basic');
+                if (PLAN_FEATURES[planForPanel] && planForPanel !== 'basic') {
+                    updateSubscriptionStatusPanel(planForPanel, subscriptionStart, subscriptionExpiry);
+                }
+            }
+        }, 60000);
+
+        // ===== BIO LOAD MORE =====
+        const bioText = document.getElementById('bioText');
+        const bioToggleBtn = document.getElementById('bioToggleBtn');
+
+        if (bioText && bioToggleBtn) {
+            bioToggleBtn.addEventListener('click', function() {
+                const isCollapsed = bioText.classList.contains('bio-collapsed');
+                bioText.classList.toggle('bio-collapsed', !isCollapsed);
+                this.classList.toggle('expanded', isCollapsed);
+                this.querySelector('span').textContent = isCollapsed ? 'Show less' : 'Load more';
+            });
+        }
+
+    })();
+</script>
+
+</body>
+</html>
